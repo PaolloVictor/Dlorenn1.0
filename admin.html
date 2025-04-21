@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin.css">
+    <title>Administração - D.Lorenn</title>
+</head>
+
+<body>
+    <header>
+        <a href="index.html">
+            <img src="img/logo dlorem3.png" alt="logo fp">
+        </a>
+
+        <div class="menu-hamburguer">
+            <div class="bar1"></div>
+            <div class="bar2"></div>
+            <div class="bar3"></div>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="index.html"><img src="img/home-icon.svg" alt="Home" style="width: 20px; height: 20px; vertical-align: middle;"></a></li>
+                <li><a href="galeria.html"><img src="img/calcados.png" alt="Galeria" style="width: 30px; height: 30px; vertical-align: middle;"></a></li>
+                <li><a href="admin.html" class="active">Admin</a></li>
+                <li class="carrinho-menu">
+                    <a href="carrinho.html">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="contador-carrinho">0</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="menu-mobile">
+            <ul>
+                <li><a href="index.html"><img src="img/home-icon.svg" alt="Home" style="width: 20px; height: 20px; vertical-align: middle;"></a></li>
+                <li><a href="galeria.html"><img src="img/calcados.png" alt="Galeria" style="width: 30px; height: 30px; vertical-align: middle;"></a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <section class="admin-section">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1>Painel de Administração</h1>
+                <p class="admin-intro">Gerencie produtos, categorias e visualize estatísticas de vendas.</p>
+            </div>
+
+            <!-- Login de Administrador (mostrado quando não autenticado) -->
+            <div id="admin-login" class="admin-login-container">
+                <h2>Acesso Restrito</h2>
+                <p>Faça login para acessar o painel administrativo.</p>
+                <form id="admin-login-form">
+                    <div class="form-group">
+                        <label for="admin-email">E-mail</label>
+                        <input type="email" id="admin-email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="admin-senha">Senha</label>
+                        <input type="password" id="admin-senha" name="senha" required>
+                    </div>
+                    
+                    <div id="login-error" class="error-message"></div>
+                    
+                    <button type="submit" class="admin-btn primary-btn">Entrar</button>
+                </form>
+            </div>
+
+            <!-- Painel de Administração (mostrado após autenticação) -->
+            <div id="admin-panel" class="admin-panel" style="display: none;">
+                <div class="admin-tabs">
+                    <button class="tab-btn active" data-tab="produtos">Produtos</button>
+                    <button class="tab-btn" data-tab="categorias">Categorias</button>
+                    <button class="tab-btn" data-tab="estatisticas">Estatísticas</button>
+                </div>
+
+                <!-- Tab de Produtos -->
+                <div class="tab-content active" id="produtos-tab">
+                    <div class="admin-actions">
+                        <button id="adicionar-produto-btn" class="admin-btn primary-btn">
+                            <i class="fas fa-plus"></i> Adicionar Produto
+                        </button>
+                        <div class="admin-search">
+                            <input type="text" id="busca-admin" placeholder="Buscar produtos...">
+                            <button id="busca-admin-btn"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="produtos-table-container">
+                        <table class="produtos-table">
+                            <thead>
+                                <tr>
+                                    <th>Imagem</th>
+                                    <th>Nome</th>
+                                    <th>Categoria</th>
+                                    <th>Preço</th>
+                                    <th>Cores</th>
+                                    <th>Tamanhos</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="produtos-lista">
+                                <!-- Produtos serão carregados dinamicamente aqui -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab de Categorias -->
+                <div class="tab-content" id="categorias-tab">
+                    <div class="admin-actions">
+                        <button id="adicionar-categoria-btn" class="admin-btn primary-btn">
+                            <i class="fas fa-plus"></i> Adicionar Categoria
+                        </button>
+                    </div>
+
+                    <div class="categorias-container">
+                        <table class="categorias-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Descrição</th>
+                                    <th>Produtos</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categorias-lista">
+                                <!-- Categorias serão carregadas dinamicamente aqui -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab de Estatísticas -->
+                <div class="tab-content" id="estatisticas-tab">
+                    <div class="estatisticas-grid">
+                        <div class="estatistica-card">
+                            <h3>Total de Produtos</h3>
+                            <p class="estatistica-valor" id="total-produtos">0</p>
+                        </div>
+                        <div class="estatistica-card">
+                            <h3>Vendas do Mês</h3>
+                            <p class="estatistica-valor" id="vendas-mes">R$ 0,00</p>
+                        </div>
+                        <div class="estatistica-card">
+                            <h3>Produtos Mais Vendidos</h3>
+                            <ul id="produtos-populares" class="estatistica-lista">
+                                <!-- Produtos populares serão carregados aqui -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal para adicionar/editar produto -->
+    <div id="produto-modal" class="admin-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-titulo">Adicionar Produto</h2>
+                <button class="fechar-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="produto-form">
+                    <input type="hidden" id="produto-id">
+                    
+                    <div class="form-group">
+                        <label for="produto-nome">Nome do Produto</label>
+                        <input type="text" id="produto-nome" name="nome" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="produto-descricao">Descrição</label>
+                        <textarea id="produto-descricao" name="descricao" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="produto-preco">Preço (R$)</label>
+                            <input type="number" id="produto-preco" name="preco" step="0.01" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="produto-categoria">Categoria</label>
+                            <select id="produto-categoria" name="categoria" required>
+                                <option value="">Selecione...</option>
+                                <option value="casual">Casual</option>
+                                <option value="festa">Festa</option>
+                                <option value="praia">Praia</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Cores Disponíveis</label>
+                        <div class="cores-container" id="cores-container">
+                            <div class="cor-item">
+                                <input type="color" class="cor-input" value="#ffffff">
+                                <button type="button" class="remover-cor"><i class="fas fa-times"></i></button>
+                            </div>
+                            <button type="button" id="adicionar-cor" class="adicionar-btn">+ Cor</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tamanhos Disponíveis</label>
+                        <div class="tamanhos-container">
+                            <div class="tamanho-checkbox">
+                                <input type="checkbox" id="tamanho-34" name="tamanhos" value="34">
+                                <label for="tamanho-34">34</label>
+                            </div>
+                            <div class="tamanho-checkbox">
+                                <input type="checkbox" id="tamanho-35" name="tamanhos" value="35">
+                                <label for="tamanho-35">35</label>
+                            </div>
+                            <div class="tamanho-checkbox">
+                                <input type="checkbox" id="tamanho-36" name="tamanhos" value="36">
+                                <label for="tamanho-36">36</label>
+                            </div>
+                            <div class="tamanho-checkbox">
+                                <input type="checkbox" id="tamanho-37" name="tamanhos" value="37">
+                                <label for="tamanho-37">37</label>
+                            </div>
+                            <div class="tamanho-checkbox">
+                                <input type="checkbox" id="tamanho-38" name="tamanhos" value="38">
+                                <label for="tamanho-38">38</label>
+                            </div>
+                            <div class="tamanho-checkbox">
+                                <input type="checkbox" id="tamanho-39" name="tamanhos" value="39">
+                                <label for="tamanho-39">39</label>
+                            </div>
+                            <div class="tamanho-checkbox">
+                                <input type="checkbox" id="tamanho-40" name="tamanhos" value="40">
+                                <label for="tamanho-40">40</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="produto-imagem">Imagem do Produto</label>
+                        <input type="file" id="produto-imagem" name="imagem" accept="image/*">
+                        <div id="imagem-preview" class="imagem-preview"></div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="admin-btn secondary-btn cancelar-btn">Cancelar</button>
+                        <button type="submit" class="admin-btn primary-btn">Salvar Produto</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para adicionar/editar categoria -->
+    <div id="categoria-modal" class="admin-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="categoria-modal-titulo">Adicionar Categoria</h2>
+                <button class="fechar-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="categoria-form">
+                    <input type="hidden" id="categoria-id">
+                    
+                    <div class="form-group">
+                        <label for="categoria-nome">Nome da Categoria</label>
+                        <input type="text" id="categoria-nome" name="nome" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="categoria-descricao">Descrição</label>
+                        <textarea id="categoria-descricao" name="descricao" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="admin-btn secondary-btn cancelar-btn">Cancelar</button>
+                        <button type="submit" class="admin-btn primary-btn">Salvar Categoria</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmação para exclusão -->
+    <div id="confirmacao-modal" class="admin-modal">
+        <div class="modal-content confirmacao-content">
+            <div class="modal-header">
+                <h2>Confirmar Exclusão</h2>
+                <button class="fechar-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmacao-mensagem">Tem certeza que deseja excluir este item?</p>
+                <div class="form-actions">
+                    <button type="button" class="admin-btn secondary-btn cancelar-btn">Cancelar</button>
+                    <button type="button" id="confirmar-exclusao" class="admin-btn danger-btn">Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="overlay" class="modal-overlay"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <script src="admin.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="galeria.css">
+    <link rel="stylesheet" href="carrinho-fix.css">
+    <title>Galeria de Produtos - D.Lorenn</title>
+</head>
+
+<body>
+    <header>
+        <a href="index.html">
+            <img src="img/logo dlorem3.png" alt="logo fp">
+        </a>
+
+        <div class="menu-hamburguer">
+            <div class="bar1"></div>
+            <div class="bar2"></div>
+            <div class="bar3"></div>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="index.html"><img src="img/home-icon.svg" alt="Home" style="width: 30px; height: 30px; vertical-align: middle;"></a></li>
+                <li><a href="galeria.html"><img src="img/calcados.png" alt="Galeria" style="width: 30px; height: 30px; vertical-align: middle;"></a></li>
+                <li><a href="login.html"><img src="img/user-icon.svg" alt="Login" style="width: 30px; height: 30px; vertical-align: middle;"></a></li>
+                <li class="carrinho-menu">
+                    <a href="carrinho.html">
+                        <i class="fas fa-shopping-cart" style="font-size: 30px;"></i>
+                        <span class="contador-carrinho">0</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="menu-mobile">
+            <ul>
+                <li><a href="index.html"><img src="img/home-icon.svg" alt="Home" style="width: 30px; height: 30px; vertical-align: middle;"></a></li>
+                <li><a href="galeria.html"><img src="img/calcados.png" alt="Galeria" style="width: 30px; height: 30px; vertical-align: middle;"></a></li>
+                <li><a href="contato.html">Fale Conosco</a></li>
+                <li><a href="login.html"><img src="img/user-icon.svg" alt="Login" style="width: 30px; height: 30px; vertical-align: middle;"></a></li>
+                <li class="carrinho-menu">
+                    <a href="carrinho.html">
+                        <i class="fas fa-shopping-cart" style="font-size: 30px;"></i>
+                        <span class="contador-carrinho">0</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </header>
+
+    <section class="galeria-section">
+        <div class="galeria-container">
+            <h1>Nossa Coleção</h1>
+            <p class="galeria-intro">Conheça nossa linha completa de sandálias. Estilo e conforto para todos os momentos!</p>
+            
+            <div class="filtros-container">
+                <div class="busca-container">
+                    <input type="text" id="busca-produto" placeholder="Buscar produtos..." class="busca-input">
+                    <button id="busca-btn" class="busca-btn"><i class="fas fa-search"></i></button>
+                </div>
+                
+                <div class="filtros-acoes">
+                    <button id="filtrar-btn" class="filtrar-btn">Filtrar <i class="fas fa-filter"></i></button>
+                    
+                    <div class="ordenar-grupo">
+                        <label for="ordenar">Ordenar por:</label>
+                        <select id="ordenar">
+                            <option value="recentes">Mais recentes</option>
+                            <option value="preco-menor">Menor preço</option>
+                            <option value="preco-maior">Maior preço</option>
+                            <option value="nome">Nome (A-Z)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Menu lateral de filtros -->
+            <div class="filtros-menu" id="filtros-menu">
+                <div class="filtros-menu-header">
+                    <h3>Filtros</h3>
+                    <button class="fechar-filtros"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="filtro-grupo">
+                    <label>Categorias:</label>
+                    <div class="filtro-botoes">
+                        <button class="filtro-btn active" data-filter="todos">Todos</button>
+                        <button class="filtro-btn" data-filter="casual">Casual</button>
+                        <button class="filtro-btn" data-filter="festa">Festa</button>
+                        <button class="filtro-btn" data-filter="praia">Praia</button>
+                    </div>
+                </div>
+                <button class="aplicar-filtros">Aplicar Filtros</button>
+            </div>
+            
+            <!-- Overlay para quando o menu de filtros estiver aberto -->
+            <div class="filtros-overlay" id="filtros-overlay"></div>
+            
+            <div class="produtos-grid">
+                <!-- Produto 1 -->
+                <div class="produto-card" data-categoria="casual festa">
+                    <div class="produto-imagem">
+                        <img src="img/d.lorem1.png" alt="Sandália Brilhante">
+                        <div class="produto-overlay">
+                            <button class="ver-detalhes">Ver Detalhes</button>
+                        </div>
+                    </div>
+                    <div class="produto-info">
+                        <h3>Sandália Brilhante</h3>
+                        <p class="produto-categoria">Casual, Festa</p>
+                        <p class="produto-preco">R$ 89,90</p>
+                        <div class="produto-cores">
+                            <span class="cor" style="background-color: gold;"></span>
+                            <span class="cor" style="background-color: silver;"></span>
+                            <span class="cor" style="background-color: #C0C0C0;"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Produto 2 -->
+                <div class="produto-card" data-categoria="casual">
+                    <div class="produto-imagem">
+                        <img src="img/d.lorem2.png" alt="Sandália Dourada">
+                        <div class="produto-overlay">
+                            <button class="ver-detalhes">Ver Detalhes</button>
+                        </div>
+                    </div>
+                    <div class="produto-info">
+                        <h3>Sandália Dourada</h3>
+                        <p class="produto-categoria">Casual</p>
+                        <p class="produto-preco">R$ 79,90</p>
+                        <div class="produto-cores">
+                            <span class="cor" style="background-color: gold;"></span>
+                            <span class="cor" style="background-color: #BC7C56;"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Produto 3 -->
+                <div class="produto-card" data-categoria="casual praia">
+                    <div class="produto-imagem">
+                        <img src="img/d.lorem3.png" alt="Sandália Branca">
+                        <div class="produto-overlay">
+                            <button class="ver-detalhes">Ver Detalhes</button>
+                        </div>
+                    </div>
+                    <div class="produto-info">
+                        <h3>Sandália Branca</h3>
+                        <p class="produto-categoria">Casual, Praia</p>
+                        <p class="produto-preco">R$ 69,90</p>
+                        <div class="produto-cores">
+                            <span class="cor" style="background-color: white;"></span>
+                            <span class="cor" style="background-color: #f5cdc2;"></span>
+                            <span class="cor" style="background-color: black;"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Produto 4 -->
+                <div class="produto-card" data-categoria="festa">
+                    <div class="produto-imagem">
+                        <img src="img/d.lorem1.png" alt="Sandália Elegante">
+                        <div class="produto-overlay">
+                            <button class="ver-detalhes">Ver Detalhes</button>
+                        </div>
+                    </div>
+                    <div class="produto-info">
+                        <h3>Sandália Elegante</h3>
+                        <p class="produto-categoria">Festa</p>
+                        <p class="produto-preco">R$ 99,90</p>
+                        <div class="produto-cores">
+                            <span class="cor" style="background-color: black;"></span>
+                            <span class="cor" style="background-color: #BC7C56;"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Produto 5 -->
+                <div class="produto-card" data-categoria="praia">
+                    <div class="produto-imagem">
+                        <img src="img/d.lorem3.png" alt="Sandália Conforto">
+                        <div class="produto-overlay">
+                            <button class="ver-detalhes">Ver Detalhes</button>
+                        </div>
+                    </div>
+                    <div class="produto-info">
+                        <h3>Sandália Conforto</h3>
+                        <p class="produto-categoria">Praia</p>
+                        <p class="produto-preco">R$ 59,90</p>
+                        <div class="produto-cores">
+                            <span class="cor" style="background-color: #8DE2E3;"></span>
+                            <span class="cor" style="background-color: #f5cdc2;"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Produto 6 -->
+                <div class="produto-card" data-categoria="casual festa">
+                    <div class="produto-imagem">
+                        <img src="img/d.lorem2.png" alt="Sandália Glamour">
+                        <div class="produto-overlay">
+                            <button class="ver-detalhes">Ver Detalhes</button>
+                        </div>
+                    </div>
+                    <div class="produto-info">
+                        <h3>Sandália Glamour</h3>
+                        <p class="produto-categoria">Casual, Festa</p>
+                        <p class="produto-preco">R$ 109,90</p>
+                        <div class="produto-cores">
+                            <span class="cor" style="background-color: gold;"></span>
+                            <span class="cor" style="background-color: silver;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="paginacao">
+                <button class="pagina-btn active">1</button>
+                <button class="pagina-btn">2</button>
+                <button class="pagina-btn">3</button>
+                <button class="pagina-btn next">→</button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Modal de detalhes do produto -->
+    <div class="produto-modal" id="produto-modal">
+        <div class="modal-conteudo">
+            <span class="fechar-modal" title="Fechar galeria">X</span>
+            <div class="modal-grid">
+                <div class="modal-imagem">
+                    <img id="modal-img" src="" alt="Imagem do produto">
+                </div>
+                <div class="modal-detalhes">
+                    <h2 id="modal-titulo"></h2>
+                    <p class="modal-categoria" id="modal-categoria"></p>
+                    <p class="modal-preco" id="modal-preco"></p>
+                    
+                    <div class="modal-opcoes">
+                        <div class="opcao-grupo">
+                            <label>Cor:</label>
+                            <div class="cores-selecao" id="modal-cores">
+                                <!-- Cores serão adicionadas dinamicamente -->
+                            </div>
+                        </div>
+                        
+                        <div class="opcao-grupo">
+                            <label>Tamanho:</label>
+                            <div class="tamanhos-selecao">
+                                <button class="tamanho-btn">34</button>
+                                <button class="tamanho-btn">35</button>
+                                <button class="tamanho-btn">36</button>
+                                <button class="tamanho-btn">37</button>
+                                <button class="tamanho-btn">38</button>
+                                <button class="tamanho-btn">39</button>
+                            </div>
+                        </div>
+                        
+                        <div class="opcao-grupo">
+                            <label>Quantidade:</label>
+                            <div class="quantidade-selecao">
+                                <button class="qtd-btn menos">-</button>
+                                <input type="number" value="1" min="1" max="10" id="quantidade">
+                                <button class="qtd-btn mais">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-descricao">
+                        <h3>Descrição</h3>
+                        <p>Sandália confortável e elegante, perfeita para diversas ocasiões. Feita com materiais de alta qualidade que garantem durabilidade e conforto durante o uso.</p>
+                    </div>
+                    
+                    <button class="adicionar-carrinho">Adicionar ao Carrinho</button>
+                    
+                    <div class="modal-info-extra">
+                        <p><strong>Disponibilidade:</strong> Em estoque</p>
+                        <p><strong>Entrega:</strong> 3-5 dias úteis</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts.js"></script>
+    <script src="galeria.js"></script>
+</body>
+
+</html>

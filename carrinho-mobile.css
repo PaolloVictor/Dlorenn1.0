@@ -1,0 +1,170 @@
+/* Estilos para o menu hambúrguer e menu móvel do carrinho */
+.menu-hamburguer {
+    display: none;
+    cursor: pointer;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    z-index: 2100;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.bar1, .bar2, .bar3 {
+    width: 30px;
+    height: 3px;
+    background-color: #fff;
+    margin: 6px 0;
+    transition: 0.4s;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.menu-ativo .bar1 {
+    transform: rotate(-45deg) translate(-5px, 6px);
+    background-color: #8DE2E3;
+}
+
+.menu-ativo .bar2 {
+    opacity: 0;
+    transform: translateX(-20px);
+}
+
+.menu-ativo .bar3 {
+    transform: rotate(45deg) translate(-5px, -6px);
+    background-color: #8DE2E3;
+}
+
+.menu-mobile {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: transparent;
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.4s ease-in-out;
+    opacity: 0;
+    transform: translateY(-20px);
+    backdrop-filter: blur(5px);
+}
+
+.menu-mobile ul {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    transform: translateY(20px);
+    transition: transform 0.5s ease-out;
+    padding: 20px;
+    background-color: rgba(221, 143, 124, 0.95);
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 85%;
+    max-width: 300px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.menu-mobile ul li a {
+    color: #fff;
+    font-size: 1.8rem;
+    text-decoration: none;
+    font-family: "League Gothic", sans-serif;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    position: relative;
+    padding: 8px 15px;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+}
+
+.menu-mobile ul li a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 3px;
+    bottom: 0;
+    left: 50%;
+    background-color: #8DE2E3;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+    border-radius: 3px;
+}
+
+.menu-mobile ul li a:hover {
+    color: #8DE2E3;
+    transform: translateY(-3px);
+}
+
+.menu-mobile ul li a:hover::after {
+    width: 90%;
+}
+
+/* Estilo para evitar rolagem quando o menu estiver aberto */
+body.menu-aberto {
+    overflow: hidden;
+}
+
+/* Estilos para o ícone do carrinho no menu mobile */
+.menu-mobile ul li.carrinho-menu {
+    position: relative;
+}
+
+.menu-mobile ul li.carrinho-menu a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.menu-mobile ul li.carrinho-menu i {
+    font-size: 1.5rem;
+}
+
+.menu-mobile ul li.carrinho-menu .contador-carrinho {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #8DE2E3;
+    color: #000;
+    font-size: 0.8rem;
+    font-weight: 600;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Estilos para dispositivos móveis */
+@media (max-width: 768px) {
+    .menu-hamburguer {
+        display: block;
+    }
+    
+    nav {
+        display: none;
+    }
+    
+    .menu-mobile.menu-aberto {
+        display: flex;
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .menu-mobile.menu-aberto ul {
+        transform: translateY(0);
+    }
+}

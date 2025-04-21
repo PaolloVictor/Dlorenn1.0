@@ -1,0 +1,77 @@
+/* Estilos para corrigir o ícone do carrinho em todas as páginas */
+.carrinho-menu a i {
+    color: white; /* Define a cor do ícone do carrinho como branco */
+    font-size: 22px;
+    transition: color 0.3s ease;
+}
+
+.carrinho-menu a:hover i {
+    color: #8DE2E3; /* Cor ao passar o mouse */
+}
+
+.carrinho-menu .contador-carrinho {
+    background-color: #8DE2E3; /* Cor de fundo do contador */
+    color: #000; /* Cor do texto do contador */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Sombra suave */
+    transform: scale(1); /* Para animação */
+    transition: transform 0.2s ease;
+}
+
+.carrinho-menu:hover .contador-carrinho {
+    transform: scale(1.1); /* Efeito de aumento ao passar o mouse */
+}
+
+/* Estilos para o carrinho na versão mobile */
+@media (max-width: 768px) {
+    .menu-mobile .carrinho-menu {
+        position: relative;
+        margin-top: 10px;
+    }
+    
+    .menu-mobile .carrinho-menu a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 30px;
+    }
+    
+    .menu-mobile .carrinho-menu i {
+        font-size: 20px;
+        margin-right: 5px;
+    }
+    
+    .menu-mobile .contador-carrinho {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background-color: #8DE2E3;
+        color: #000;
+        font-size: 0.7rem;
+        font-weight: 600;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Ajuste para o carrinho na página do carrinho */
+    .carrinho-section {
+        padding-top: 120px !important;
+        z-index: 1;
+    }
+    
+    /* Melhorar a notificação no mobile */
+    .carrinho-notificacao {
+        width: 90% !important;
+        left: 5% !important;
+        right: 5% !important;
+        top: 80px !important;
+        padding: 12px 15px !important;
+        border-radius: 8px !important;
+    }
+}

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="perfil.css">
+    <title>Meu Perfil - D.Lorenn</title>
+</head>
+
+<body>
+    <header>
+        <a href="index.html">
+            <img src="img/logo dlorem3.png" alt="logo fp">
+        </a>
+
+        <nav>
+            <ul>
+                <li><a href="index.html"><img src="img/home-icon.svg" alt="Home" style="width: 30px; height: 30px; vertical-align: middle;"></a></li>
+                <li><a href="galeria.html"><img src="img/shop-icon.svg" alt="Galeria" style="width: 20px; height: 20px; vertical-align: middle;"></a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="perfil-section">
+        <div class="perfil-container">
+            <h1>Meu Perfil</h1>
+            
+            <div class="perfil-content">
+                <div class="perfil-sidebar">
+                    <div class="avatar-container">
+                        <img id="user-avatar" src="https://via.placeholder.com/150?text=Usuário" alt="Avatar do usuário">
+                        <button id="edit-avatar-btn" class="edit-btn">Editar foto</button>
+                    </div>
+                    
+                    <div class="perfil-menu">
+                        <ul>
+                            <li class="active"><a href="#" data-tab="info">Informações Pessoais</a></li>
+                            <li><a href="#" data-tab="pedidos">Meus Pedidos</a></li>
+                            <li><a href="#" data-tab="favoritos">Favoritos</a></li>
+                            <li><a href="#" data-tab="endereco">Endereços</a></li>
+                            <li><a href="#" data-tab="senha">Alterar Senha</a></li>
+                        </ul>
+                        
+                        <button id="logout-btn" class="logout-btn">Sair da conta</button>
+                    </div>
+                </div>
+                
+                <div class="perfil-details">
+                    <!-- Informações Pessoais -->
+                    <div class="tab-content active" id="info-tab">
+                        <div class="section-header">
+                            <h2>Informações Pessoais</h2>
+                            <button id="edit-info-btn" class="edit-btn">Editar</button>
+                        </div>
+                        
+                        <div class="info-container">
+                            <div class="info-item">
+                                <span class="info-label">Nome:</span>
+                                <span id="user-name" class="info-value">Carregando...</span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">E-mail:</span>
+                                <span id="user-email" class="info-value">Carregando...</span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">Telefone:</span>
+                                <span id="user-phone" class="info-value">Carregando...</span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">Endereço Principal:</span>
+                                <span id="user-address" class="info-value">Carregando...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Meus Pedidos -->
+                    <div class="tab-content" id="pedidos-tab">
+                        <h2>Meus Pedidos</h2>
+                        <div class="empty-state">
+                            <p>Você ainda não realizou nenhum pedido.</p>
+                            <a href="index.html" class="cta-btn">Explorar produtos</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Favoritos -->
+                    <div class="tab-content" id="favoritos-tab">
+                        <h2>Meus Favoritos</h2>
+                        <div class="empty-state">
+                            <p>Você ainda não adicionou produtos aos favoritos.</p>
+                            <a href="index.html" class="cta-btn">Explorar produtos</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Endereços -->
+                    <div class="tab-content" id="endereco-tab">
+                        <div class="section-header">
+                            <h2>Meus Endereços</h2>
+                            <button id="add-address-btn" class="edit-btn">Adicionar</button>
+                        </div>
+                        
+                        <div class="empty-state">
+                            <p>Você ainda não cadastrou nenhum endereço.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Alterar Senha -->
+                    <div class="tab-content" id="senha-tab">
+                        <h2>Alterar Senha</h2>
+                        <form id="change-password-form">
+                            <div class="form-group">
+                                <label for="current-password">Senha Atual</label>
+                                <input type="password" id="current-password" name="current-password" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="new-password">Nova Senha</label>
+                                <input type="password" id="new-password" name="new-password" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="confirm-password">Confirmar Nova Senha</label>
+                                <input type="password" id="confirm-password" name="confirm-password" required>
+                            </div>
+                            
+                            <button type="submit" class="submit-btn">Alterar Senha</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Modal de Edição de Perfil -->
+    <dialog id="edit-profile-modal" class="modal">
+        <div class="modal-content">
+            <h2>Editar Perfil</h2>
+            <form id="edit-profile-form">
+                <div class="form-group">
+                    <label for="edit-name">Nome</label>
+                    <input type="text" id="edit-name" name="nome" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-phone">Telefone</label>
+                    <input type="tel" id="edit-phone" name="telefone" placeholder="(00) 00000-0000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-address">Endereço</label>
+                    <input type="text" id="edit-address" name="endereco" placeholder="Rua, número, bairro, cidade, estado">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="document.getElementById('edit-profile-modal').close()">Cancelar</button>
+                    <button type="submit" class="submit-btn">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+    
+    <!-- Modal de Edição de Avatar -->
+    <dialog id="edit-avatar-modal" class="modal">
+        <div class="modal-content">
+            <h2>Alterar Foto de Perfil</h2>
+            <div class="avatar-preview-container">
+                <img id="avatar-preview" src="https://via.placeholder.com/150?text=Usuário" alt="Preview do avatar">
+            </div>
+            
+            <form id="avatar-form">
+                <div class="form-group">
+                    <label for="avatar-input" class="file-input-label">Selecionar Imagem</label>
+                    <input type="file" id="avatar-input" name="avatar" accept="image/*" class="file-input">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="document.getElementById('edit-avatar-modal').close()">Cancelar</button>
+                    <button type="submit" class="submit-btn">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
+    <script src="scripts.js"></script>
+    <script src="perfil.js"></script>
+</body>
+
+</html>
