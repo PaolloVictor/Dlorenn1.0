@@ -2,27 +2,25 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     // Configuração do Firebase
-    // Import the functions you need from the SDKs you need
-    import { initializeApp } from "firebase/app";
-    import { getAnalytics } from "firebase/analytics";
-    // TODO: Add SDKs for Firebase products that you want to use
-    // https://firebase.google.com/docs/web/setup#available-libraries
-
-    // Your web app's Firebase configuration
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    // Configuração do Firebase usando a versão compat (compatibilidade)
     const firebaseConfig = {
         apiKey: "AIzaSyDT-aNgU1x_KE2ZAGNm0n-ybwSLlhFlWug",
         authDomain: "dlorenn-a46ca.firebaseapp.com",
         projectId: "dlorenn-a46ca",
-        storageBucket: "dlorenn-a46ca.firebasestorage.app",
+        storageBucket: "dlorenn-a46ca.appspot.com",
         messagingSenderId: "506404020523",
         appId: "1:506404020523:web:a2f6219e6c70699d95e56e",
         measurementId: "G-ZL75PD9788"
     };
 
-    // Inicializar Firebase
+    // Inicializar Firebase (verificando se já foi inicializado)
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
+    }
+    
+    // Habilitar analytics se disponível
+    if (firebase.analytics) {
+        firebase.analytics();
     }
 
     // Referências aos serviços do Firebase

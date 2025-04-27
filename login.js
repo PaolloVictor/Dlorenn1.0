@@ -1,12 +1,7 @@
 // Configuração do Firebase
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// Configuração para Firebase SDK v9 (versão compat)
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Configuração do Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDT-aNgU1x_KE2ZAGNm0n-ybwSLlhFlWug",
   authDomain: "dlorenn-a46ca.firebaseapp.com",
@@ -17,9 +12,165 @@ const firebaseConfig = {
   measurementId: "G-ZL75PD9788"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+// Verificar se o Firebase já está inicializado
+if (typeof firebase === 'undefined') {
+  console.error('Firebase SDK não está carregado. Verifique se os scripts foram incluídos corretamente.');
+} else {
+  // Inicializar Firebase (verificando se já foi inicializado)
+  if (!firebase.apps || !firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+    console.log('Firebase inicializado com sucesso');
+    
+    // Verificar domínio atual para autenticação OAuth
+    const currentDomain = window.location.hostname;
+    console.log('Domínio atual:', currentDomain);
+    if (currentDomain !== 'localhost' && 
+        currentDomain !== '127.0.0.1' && 
+        !currentDomain.includes('dlorenn-a46ca.firebaseapp.com') && 
+        !currentDomain.includes('dlorenn-a46ca.web.app')) {
+      console.warn('Aviso: Este domínio pode não estar autorizado no Firebase Console para autenticação OAuth');
+    }
+  } else {
+    console.log('Firebase já estava inicializado');
+  }
+
+  // Habilitar analytics se disponível
+  if (firebase.analytics) {
+    firebase.analytics();
+  }
+}
+
+// Verificar se há resultado pendente de redirecionamento (para login social)
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    // Verificar se há resultado pendente de redirecionamento
+    const result = await firebase.auth().getRedirectResult();
+    if (result.user) {
+      console.log('Login por redirecionamento detectado');
+      const user = result.user;
+      const isNewUser = result.additionalUserInfo?.isNewUser || false;
+      const providerId = result.additionalUserInfo?.providerId || user.providerData[0]?.providerId || '';
+      
+      console.log('Autenticação por redirecionamento bem-sucedida:', {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        providerId: providerId,
+        isNewUser: isNewUser
+      });
+      
+      // Determinar o provedor para armazenar no Firestore
+      let authProvider = 'email';
+      if (providerId.includes('google')) {
+        authProvider = 'google';
+      } else if (providerId.includes('facebook')) {
+        authProvider = 'facebook';
+      }
+      
+      // Salvar dados do usuário no Firestore
+      await saveUserData(user, {
+        providerData: providerId,
+        authProvider: authProvider,
+        isNewUser: isNewUser,
+        termsAccepted: true,
+        termsAcceptedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      showSuccess(isNewUser ? 'Conta criada com sucesso!' : 'Login realizado com sucesso!');
+      redirectAfterLogin();
+    }
+  } catch (error) {
+    console.error('Erro ao processar resultado de redirecionamento:', error);
+    if (error.code === 'auth/account-exists-with-different-credential') {
+      // Tratar erro de conta existente com credencial diferente
+      const email = error.email;
+      const pendingCred = error.credential;
+      
+      // Buscar métodos de login disponíveis para este email
+      const methods = await firebase.auth().fetchSignInMethodsForEmail(email);
+      
+      // Mostrar mensagem de erro com opções para o usuário
+      const errorContainer = document.querySelector('.error-message') || document.createElement('div');
+      errorContainer.className = 'error-message';
+      errorContainer.innerHTML = `
+        <p>Este email já está associado a outra conta. Você pode:</p>
+        <ul>
+          <li>Fazer login com: ${methods.join(', ')}</li>
+          <li><a href="#" id="link-accounts">Vincular estas contas</a></li>
+        </ul>
+      `;
+      
+      // Adicionar ao DOM se ainda não estiver
+      const messageContainer = document.querySelector('.message-container') || document.querySelector('.form-container');
+      if (!document.querySelector('.error-message') && messageContainer) {
+        messageContainer.prepend(errorContainer);
+      }
+      
+      // Adicionar evento para vincular contas
+      document.getElementById('link-accounts')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        try {
+          // Primeiro método disponível
+          const provider = getProviderForId(methods[0]);
+          if (!provider) {
+            showError('Não foi possível vincular as contas. Método de login não suportado.');
+            return;
+          }
+          
+          // Fazer login com o primeiro método
+          const result = await firebase.auth().signInWithPopup(provider);
+          
+          // Vincular a credencial pendente
+          await result.user.linkWithCredential(pendingCred);
+          
+          showSuccess('Contas vinculadas com sucesso!');
+          redirectAfterLogin();
+        } catch (linkError) {
+          console.error('Erro ao vincular contas:', linkError);
+          showError('Não foi possível vincular as contas. Por favor, tente novamente.');
+        }
+      });
+    } else if (error.code === 'auth/credential-already-in-use') {
+      // Adicionar tratamento específico para credencial já em uso
+      showError('Esta conta já está sendo usada. Tente fazer login diretamente.');
+    } else if (error.code === 'auth/popup-closed-by-user') {
+      // Usuário fechou o popup antes de completar o login
+      showError('Login cancelado. Tente novamente.');
+    } else if (error.code === 'auth/cancelled-popup-request') {
+      // Múltiplas solicitações de popup
+      console.warn('Solicitação de popup cancelada');
+    } else if (error.code === 'auth/popup-blocked') {
+      // Popup bloqueado pelo navegador
+      showError('O popup de login foi bloqueado. Por favor, permita popups para este site e tente novamente.');
+    } else if (error.code === 'auth/network-request-failed') {
+      // Problemas de rede
+      showError('Erro de conexão. Verifique sua internet e tente novamente.');
+    } else {
+      showError('Ocorreu um erro durante o login. Por favor, tente novamente.');
+    }
+  }
+});
+
+// Configurar provedores de autenticação
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+// Adicionar escopos necessários para o Google
+googleProvider.addScope('profile');
+googleProvider.addScope('email');
+// Configurar parâmetros adicionais para o Google
+googleProvider.setCustomParameters({
+  'prompt': 'select_account'
+});
+
+const facebookProvider = new firebase.auth.FacebookAuthProvider();
+// Adicionar escopos necessários para o Facebook
+facebookProvider.addScope('email');
+facebookProvider.addScope('public_profile');
+// Configurar parâmetros adicionais para o Facebook
+facebookProvider.setCustomParameters({
+  'display': 'popup',
+  'auth_type': 'rerequest'
+});
 
 // Referências aos serviços do Firebase
 const auth = firebase.auth();
@@ -249,59 +400,285 @@ function redirectAfterLogin() {
 }
 
 // Função para salvar dados do usuário no Firestore
-function saveUserData(user, additionalData = {}) {
-    const userData = {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName || additionalData.nome || '',
-        phoneNumber: user.phoneNumber || additionalData.telefone || '',
-        photoURL: user.photoURL || '',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-        ...additionalData
-    };
-    
-    return db.collection('usuarios').doc(user.uid).set(userData, { merge: true });
+async function saveUserData(user, additionalData = {}) {
+    try {
+        if (!user || !user.uid) {
+            console.error('Erro ao salvar dados: usuário inválido', user);
+            return Promise.reject(new Error('Usuário inválido'));
+        }
+        
+        console.log('Salvando dados do usuário:', user.uid);
+        
+        const userData = {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName || additionalData.nome || '',
+            phoneNumber: user.phoneNumber || additionalData.telefone || '',
+            photoURL: user.photoURL || '',
+            emailVerified: user.emailVerified,
+            lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+            ...additionalData
+        };
+        
+        // Adicionar createdAt apenas se for um novo usuário ou se não existir
+        if (additionalData.isNewUser) {
+            userData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        }
+        
+        // Verificar se o documento já existe
+        const docRef = db.collection('usuarios').doc(user.uid);
+        const doc = await docRef.get();
+        
+        if (!doc.exists) {
+            // Se o documento não existir, garantir que createdAt seja definido
+            if (!userData.createdAt) {
+                userData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+            }
+            console.log('Criando novo documento de usuário');
+        } else {
+            console.log('Atualizando documento de usuário existente');
+        }
+        
+        // Salvar os dados com merge para preservar campos existentes
+        return await docRef.set(userData, { merge: true });
+    } catch (error) {
+        console.error('Erro ao salvar dados do usuário:', error);
+        return Promise.reject(error);
+    }
 }
 
-// Login com email e senha
-loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const email = document.getElementById('login-email').value;
-    const senha = document.getElementById('login-senha').value;
-    const lembrar = document.getElementById('lembrar').checked;
-    
+// Função para autenticação com provedor social (Google ou Facebook)
+async function signInWithProvider(provider, isSignup = false) {
     try {
-        // Definir persistência com base na opção "lembrar-me"
-        await auth.setPersistence(lembrar ? 
-            firebase.auth.Auth.Persistence.LOCAL : 
-            firebase.auth.Auth.Persistence.SESSION
-        );
+        console.log('Iniciando autenticação com provedor:', provider.providerId);
         
-        // Fazer login
-        const userCredential = await auth.signInWithEmailAndPassword(email, senha);
+        // Mostrar indicador de carregamento
+        const activeTab = document.querySelector('.tab-content.active');
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.className = 'loading-indicator';
+        loadingIndicator.innerHTML = '<div class="spinner"></div><p>Conectando...</p>';
+        loadingIndicator.style.textAlign = 'center';
+        loadingIndicator.style.margin = '10px 0';
         
-        // Atualizar último login
-        await db.collection('usuarios').doc(userCredential.user.uid).update({
-            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+        if (activeTab) {
+            const socialButtons = activeTab.querySelector('.social-buttons');
+            if (socialButtons) {
+                socialButtons.appendChild(loadingIndicator);
+            }
+        }
+        
+        // Verificar se o provedor está disponível
+        if (!provider) {
+            throw new Error('Provedor de autenticação não configurado corretamente');
+        }
+        
+        // Verificar domínio atual para autenticação OAuth
+        const currentDomain = window.location.hostname;
+        console.log('Domínio atual para autenticação:', currentDomain);
+        
+        // Verificar se estamos em um ambiente móvel
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        let result;
+        // Em dispositivos móveis, usar diretamente o redirecionamento para evitar problemas com popups
+        if (isMobile) {
+            console.log('Dispositivo móvel detectado, usando signInWithRedirect');
+            await auth.signInWithRedirect(provider);
+            return; // Encerrar função, pois o redirecionamento ocorrerá
+        } else {
+            try {
+                // Em desktop, tentar primeiro com popup (mais rápido)
+                result = await auth.signInWithPopup(provider);
+                console.log('Login com popup bem-sucedido');
+            } catch (popupError) {
+                console.warn('Erro no login com popup, tentando com redirect:', popupError);
+                // Se falhar com popup, tentar com redirect
+                await auth.signInWithRedirect(provider);
+                // O resultado será processado após o redirecionamento
+                return; // Encerrar função, pois o redirecionamento ocorrerá
+            }
+        }
+        
+        const user = result.user;
+        const isNewUser = result.additionalUserInfo?.isNewUser || false;
+        const providerId = result.additionalUserInfo?.providerId || user.providerData[0]?.providerId || '';
+        
+        console.log('Autenticação bem-sucedida:', {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            providerId: providerId,
+            isNewUser: isNewUser
         });
         
-        showSuccess('Login realizado com sucesso!');
+        // Determinar o provedor para armazenar no Firestore
+        let authProvider = 'email';
+        if (providerId.includes('google')) {
+            authProvider = 'google';
+        } else if (providerId.includes('facebook')) {
+            authProvider = 'facebook';
+        }
+        
+        // Salvar dados do usuário no Firestore
+        await saveUserData(user, {
+            providerData: providerId,
+            authProvider: authProvider,
+            isNewUser: isNewUser,
+            termsAccepted: true,
+            termsAcceptedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // Remover indicador de carregamento
+        if (loadingIndicator && loadingIndicator.parentNode) {
+            loadingIndicator.parentNode.removeChild(loadingIndicator);
+        }
+        
+        showSuccess(isNewUser ? 'Conta criada com sucesso!' : 'Login realizado com sucesso!');
         redirectAfterLogin();
     } catch (error) {
-        console.error('Erro no login:', error);
-        let errorMessage = 'Ocorreu um erro ao fazer login. Tente novamente.';
+        console.error('Erro na autenticação social:', error);
+        let errorMessage = 'Ocorreu um erro na autenticação. Tente novamente.';
         
-        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-            errorMessage = 'Email ou senha incorretos.';
-        } else if (error.code === 'auth/too-many-requests') {
-            errorMessage = 'Muitas tentativas de login. Tente novamente mais tarde.';
+        if (error.code === 'auth/account-exists-with-different-credential') {
+            console.log('Erro de credencial existente com outro provedor:', error.email);
+            errorMessage = 'Já existe uma conta com este email usando outro método de login. Tente fazer login com ' + 
+                          (error.email ? error.email : 'o método usado anteriormente') + '.';
+                          
+            // Tentar obter os métodos de login disponíveis para este email
+            if (error.email) {
+                auth.fetchSignInMethodsForEmail(error.email)
+                    .then(methods => {
+                        console.log('Métodos de login disponíveis para', error.email, ':', methods);
+                        if (methods && methods.length > 0) {
+                            errorMessage += ' Métodos disponíveis: ' + methods.join(', ');
+                            showError(errorMessage);
+                        }
+                    })
+                    .catch(fetchError => {
+                        console.error('Erro ao buscar métodos de login:', fetchError);
+                    });
+            }
+        } else if (error.code === 'auth/popup-closed-by-user') {
+            errorMessage = 'O processo de login foi cancelado.';
+        } else if (error.code === 'auth/popup-blocked') {
+            errorMessage = 'O popup de login foi bloqueado pelo navegador. Por favor, permita popups para este site.';
+        } else if (error.code === 'auth/cancelled-popup-request') {
+            errorMessage = 'Operação cancelada. Tente novamente.';
+        } else if (error.code === 'auth/network-request-failed') {
+            errorMessage = 'Erro de conexão. Verifique sua internet e tente novamente.';
+        } else if (error.code === 'auth/operation-not-allowed') {
+            console.error('Provedor não habilitado no Firebase Console:', provider.providerId);
+            errorMessage = 'Este método de login não está habilitado. Entre em contato com o suporte.';
+        } else if (error.code === 'auth/unauthorized-domain') {
+            console.error('Domínio não autorizado para autenticação OAuth');
+            errorMessage = 'Este site não está autorizado para login social. Entre em contato com o suporte.';
         }
         
         showError(errorMessage);
+        
+        // Remover indicador de carregamento em caso de erro
+        const loadingIndicator = document.querySelector('.loading-indicator');
+        if (loadingIndicator && loadingIndicator.parentNode) {
+            loadingIndicator.parentNode.removeChild(loadingIndicator);
+        }
     }
-});
+}
+
+// Login com Google
+googleLoginBtn.addEventListener('click', () => signInWithProvider(googleProvider));
+googleSignupBtn.addEventListener('click', () => signInWithProvider(googleProvider, true));
+
+// Login com Facebook
+facebookLoginBtn.addEventListener('click', () => signInWithProvider(facebookProvider));
+facebookSignupBtn.addEventListener('click', () => signInWithProvider(facebookProvider, true));
+
+// Adicionar estilos para o indicador de carregamento
+const style = document.createElement('style');
+style.textContent = `
+.loading-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 15px 0;
+}
+.spinner {
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top: 3px solid #3498db;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 5px;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+`;
+document.head.appendChild(style);
+
+// Login com email e senha
+if (loginForm) {
+  loginForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Obter valores do formulário
+    const email = document.getElementById('login-email').value;
+    const senha = document.getElementById('login-senha').value;
+    
+    if (!email || !senha) {
+      showError('Por favor, preencha todos os campos.');
+      return;
+    }
+    
+    // Mostrar indicador de carregamento
+    const btnLogin = loginForm.querySelector('button[type="submit"]');
+    const btnTextoOriginal = btnLogin.textContent;
+    btnLogin.disabled = true;
+    btnLogin.textContent = 'Entrando...';
+    
+    // Autenticar com Firebase
+    auth.signInWithEmailAndPassword(email, senha)
+      .then((userCredential) => {
+        // Login bem-sucedido
+        const user = userCredential.user;
+        
+        // Atualizar último login no Firestore
+        return db.collection('usuarios').doc(user.uid).update({
+          lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      })
+      .then(() => {
+        // Mostrar mensagem de sucesso
+        showSuccess('Login realizado com sucesso! Redirecionando...');
+        
+        // Redirecionar para a página de perfil
+        setTimeout(() => {
+          window.location.href = 'perfil.html';
+        }, 1500);
+      })
+      .catch((error) => {
+        console.error('Erro no login:', error);
+        
+        // Traduzir mensagens de erro comuns
+        let mensagem = 'Erro ao realizar login. Verifique suas credenciais.';
+        
+        if (error.code === 'auth/user-not-found') {
+          mensagem = 'Usuário não encontrado. Verifique seu email.';
+        } else if (error.code === 'auth/wrong-password') {
+          mensagem = 'Senha incorreta. Tente novamente.';
+        } else if (error.code === 'auth/invalid-email') {
+          mensagem = 'Email inválido. Verifique o formato do email.';
+        } else if (error.code === 'auth/too-many-requests') {
+          mensagem = 'Muitas tentativas de login. Tente novamente mais tarde.';
+        }
+        
+        showError(mensagem);
+        btnLogin.disabled = false;
+        btnLogin.textContent = btnTextoOriginal;
+      });
+  });
+}
 
 // Cadastro com email e senha
 cadastroForm.addEventListener('submit', async (e) => {
@@ -314,6 +691,12 @@ cadastroForm.addEventListener('submit', async (e) => {
     const senha = document.getElementById('cadastro-senha').value;
     const confirmarSenha = document.getElementById('cadastro-confirmar-senha').value;
     const termos = document.getElementById('termos').checked;
+    
+    // Desabilitar o botão de submit para evitar múltiplos envios
+    const submitBtn = cadastroForm.querySelector('.submit-btn');
+    const originalBtnText = submitBtn.textContent;
+    submitBtn.textContent = 'Processando...';
+    submitBtn.disabled = true;
     
     // Validações mais robustas
     const errors = [];
@@ -382,33 +765,40 @@ cadastroForm.addEventListener('submit', async (e) => {
     // Se houver erros, mostrar e interromper
     if (errors.length > 0) {
         showError(errors.join('<br>'));
+        // Restaurar o botão
+        submitBtn.textContent = originalBtnText;
+        submitBtn.disabled = false;
         return;
     }
     
     try {
-        console.log('Tentando criar usuário com email:', email);
         // Criar usuário
         const userCredential = await auth.createUserWithEmailAndPassword(email, senha);
-        console.log('Usuário criado com sucesso:', userCredential.user.uid);
         
         // Atualizar perfil do usuário
-        console.log('Atualizando perfil com nome:', nome);
         await userCredential.user.updateProfile({
             displayName: nome
         });
         
         // Salvar dados adicionais no Firestore
-        console.log('Salvando dados adicionais no Firestore');
         await saveUserData(userCredential.user, {
             nome,
             telefone,
             termsAccepted: true,
-            termsAcceptedAt: firebase.firestore.FieldValue.serverTimestamp()
+            termsAcceptedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         
-        showSuccess('Conta criada com sucesso!');
-        // Comentado para permitir verificar se o cadastro foi bem-sucedido
-        // redirectAfterLogin();
+        // Enviar email de verificação
+        await userCredential.user.sendEmailVerification();
+        
+        // Mostrar mensagem de sucesso mais detalhada
+        showSuccess('Conta criada com sucesso! Enviamos um email de verificação para ' + email + '. Você será redirecionado para seu perfil em instantes.');
+        
+        // Dar tempo para o usuário ver a mensagem antes de redirecionar
+        setTimeout(() => {
+            redirectAfterLogin();
+        }, 3000);
     } catch (error) {
         console.error('Erro no cadastro:', error);
         let errorMessage = 'Ocorreu um erro ao criar sua conta. Tente novamente.';
@@ -419,73 +809,35 @@ cadastroForm.addEventListener('submit', async (e) => {
             errorMessage = 'A senha é muito fraca. Use pelo menos 6 caracteres.';
         } else if (error.code === 'auth/invalid-email') {
             errorMessage = 'Email inválido.';
+        } else if (error.code === 'auth/network-request-failed') {
+            errorMessage = 'Erro de conexão. Verifique sua internet e tente novamente.';
         }
         
         showError(errorMessage);
+        
+        // Restaurar o botão
+        submitBtn.textContent = originalBtnText;
+        submitBtn.disabled = false;
     }
 });
-
-// Login com Google
-async function signInWithGoogle() {
-    try {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        const userCredential = await auth.signInWithPopup(provider);
-        
-        // Verificar se é um novo usuário
-        const isNewUser = userCredential.additionalUserInfo.isNewUser;
-        
-        // Salvar dados do usuário
-        await saveUserData(userCredential.user, {
-            termsAccepted: true,
-            termsAcceptedAt: firebase.firestore.FieldValue.serverTimestamp(),
-            authProvider: 'google'
-        });
-        
-        showSuccess(isNewUser ? 'Conta criada com sucesso!' : 'Login realizado com sucesso!');
-        redirectAfterLogin();
-    } catch (error) {
-        console.error('Erro no login com Google:', error);
-        showError('Ocorreu um erro ao fazer login com Google. Tente novamente.');
-    }
-}
-
-// Login com Facebook
-async function signInWithFacebook() {
-    try {
-        const provider = new firebase.auth.FacebookAuthProvider();
-        const userCredential = await auth.signInWithPopup(provider);
-        
-        // Verificar se é um novo usuário
-        const isNewUser = userCredential.additionalUserInfo.isNewUser;
-        
-        // Salvar dados do usuário
-        await saveUserData(userCredential.user, {
-            termsAccepted: true,
-            termsAcceptedAt: firebase.firestore.FieldValue.serverTimestamp(),
-            authProvider: 'facebook'
-        });
-        
-        showSuccess(isNewUser ? 'Conta criada com sucesso!' : 'Login realizado com sucesso!');
-        redirectAfterLogin();
-    } catch (error) {
-        console.error('Erro no login com Facebook:', error);
-        showError('Ocorreu um erro ao fazer login com Facebook. Tente novamente.');
-    }
-}
-
-// Eventos para botões de login social
-googleLoginBtn.addEventListener('click', signInWithGoogle);
-facebookLoginBtn.addEventListener('click', signInWithFacebook);
-googleSignupBtn.addEventListener('click', signInWithGoogle);
-facebookSignupBtn.addEventListener('click', signInWithFacebook);
 
 // Verificar se o usuário já está logado
 auth.onAuthStateChanged(user => {
     if (user) {
-        // Usuário já está logado, redirecionar para a página de perfil
+        // Usuário já está logado, podemos redirecionar ou mostrar informações
+        console.log('Usuário logado:', user.displayName || user.email);
+        
+        // Atualizar último login no Firestore
+        db.collection('usuarios').doc(user.uid).set({
+            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true }).catch(error => {
+            console.error('Erro ao atualizar último login:', error);
+        });
+        
         // Comentado para permitir testes na página de login
         // redirectAfterLogin();
-        console.log('Usuário logado:', user.displayName);
+    } else {
+        console.log('Nenhum usuário logado');
     }
 });
 
@@ -609,3 +961,20 @@ document.querySelector('.forgot-password').addEventListener('click', (e) => {
         }
     });
 });
+
+
+// Função auxiliar para obter o provedor baseado no ID
+function getProviderForId(providerId) {
+  if (providerId.includes('google.com')) {
+    return googleProvider;
+  } else if (providerId.includes('facebook.com')) {
+    return facebookProvider;
+  } else if (providerId.includes('password')) {
+    // Para login com email/senha, precisamos de uma abordagem diferente
+    showError('Por favor, faça login com email e senha primeiro, depois tente vincular sua conta.');
+    // Mostrar a aba de login
+    document.querySelector('[data-tab="login"]').click();
+    return null;
+  }
+  return null;
+}

@@ -1,0 +1,192 @@
+/* Estilos para a página de perfil - D.Lorenn */
+
+.perfil-container {
+    display: flex;
+    gap: 30px;
+    margin: 30px 0;
+}
+
+.perfil-sidebar {
+    flex: 0 0 250px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.perfil-conteudo {
+    flex: 1;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.foto-perfil-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#foto-perfil-preview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 15px;
+    border: 3px solid #f0c14b;
+}
+
+#foto-perfil-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.btn-upload {
+    display: inline-block;
+    background-color: #f0c14b;
+    color: #333;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.btn-upload:hover {
+    background-color: #e0b33c;
+}
+
+.menu-perfil {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-perfil li {
+    margin-bottom: 10px;
+}
+
+.menu-perfil li a {
+    display: block;
+    padding: 10px 15px;
+    color: #333;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.menu-perfil li a:hover {
+    background-color: #f0c14b;
+    color: #333;
+}
+
+.menu-perfil li.active a {
+    background-color: #f0c14b;
+    color: #333;
+    font-weight: bold;
+}
+
+.perfil-conteudo h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #333;
+    border-bottom: 2px solid #f0c14b;
+    padding-bottom: 10px;
+}
+
+.perfil-conteudo h3 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    color: #555;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #555;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 5px;
+    color: #777;
+    font-size: 12px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.form-actions {
+    margin-top: 30px;
+}
+
+.btn-primary {
+    background-color: #f0c14b;
+    color: #333;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #e0b33c;
+}
+
+.mensagem-sucesso,
+.mensagem-erro {
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.mensagem-sucesso {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.mensagem-erro {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .perfil-container {
+        flex-direction: column;
+    }
+    
+    .perfil-sidebar {
+        flex: 0 0 auto;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+}
