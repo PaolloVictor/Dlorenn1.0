@@ -1,29 +1,15 @@
 // Script para gerenciamento de perfil do usuário - D.Lorenn
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Configuração do Firebase
-    const firebaseConfig = {
-        apiKey: "AIzaSyDT-aNgU1x_KE2ZAGNm0n-ybwSLlhFlWug",
-        authDomain: "dlorenn-a46ca.firebaseapp.com",
-        projectId: "dlorenn-a46ca",
-        storageBucket: "dlorenn-a46ca.firebasestorage.app",
-        messagingSenderId: "506404020523",
-        appId: "1:506404020523:web:a2f6219e6c70699d95e56e",
-        measurementId: "G-ZL75PD9788"
-    };
-
-    // Inicializar Firebase (verificando se já foi inicializado)
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    
-    // Referências aos serviços do Firebase
+    // Referências aos serviços do Firebase (já inicializado no firebase-config.js)
     const auth = firebase.auth();
     const db = firebase.firestore();
     const storage = firebase.storage();
     
     // Elementos DOM
     const perfilForm = document.getElementById('perfil-form');
+    const enderecoForm = document.getElementById('endereco-form');
+    const senhaForm = document.getElementById('senha-form');
     const fotoPerfilInput = document.getElementById('foto-perfil');
     const fotoPerfilPreview = document.getElementById('foto-perfil-preview');
     const nomeUsuario = document.getElementById('nome-usuario');
@@ -33,9 +19,35 @@ document.addEventListener('DOMContentLoaded', function() {
     const cidadeUsuario = document.getElementById('cidade-usuario');
     const estadoUsuario = document.getElementById('estado-usuario');
     const cepUsuario = document.getElementById('cep-usuario');
+    const buscarCepBtn = document.getElementById('buscar-cep');
     const mensagemSucesso = document.getElementById('mensagem-sucesso');
     const mensagemErro = document.getElementById('mensagem-erro');
     const btnSair = document.getElementById('btn-sair');
+    
+    // Gerenciamento de abas
+    const tabLinks = document.querySelectorAll('.menu-perfil a[data-tab]');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remover classe ativa de todos os links
+            tabLinks.forEach(l => l.parentElement.classList.remove('active'));
+            
+            // Adicionar classe ativa ao link clicado
+            this.parentElement.classList.add('active');
+            
+            // Esconder todos os conteúdos
+            tabContents.forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Mostrar o conteúdo correspondente
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).style.display = 'block';
+        });
+    });
     
     // Verificar estado de autenticação
     auth.onAuthStateChanged(function(user) {
@@ -102,7 +114,46 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Salvar perfil
+    // Buscar endereço pelo CEP
+    if (buscarCepBtn) {
+        buscarCepBtn.addEventListener('click', function() {
+            const cep = cepUsuario.value.replace(/\D/g, '');
+            
+            if (cep.length !== 8) {
+                mostrarErro('CEP inválido. Digite um CEP com 8 dígitos.');
+                return;
+            }
+            
+            // Mostrar indicador de carregamento
+            buscarCepBtn.disabled = true;
+            buscarCepBtn.textContent = 'Buscando...';
+            
+            // Consultar API ViaCEP
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.erro) {
+                        mostrarErro('CEP não encontrado.');
+                    } else {
+                        // Preencher campos de endereço
+                        enderecoUsuario.value = `${data.logradouro}, ${data.complemento}`;
+                        cidadeUsuario.value = data.localidade;
+                        estadoUsuario.value = data.uf;
+                        mostrarSucesso('Endereço encontrado com sucesso!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar CEP:', error);
+                    mostrarErro('Erro ao buscar CEP. Tente novamente mais tarde.');
+                })
+                .finally(() => {
+                    buscarCepBtn.disabled = false;
+                    buscarCepBtn.textContent = 'Buscar';
+                });
+        });
+    }
+    
+    // Salvar dados pessoais
     if (perfilForm) {
         perfilForm.addEventListener('submit', function(e) {
             e.preventDefault();

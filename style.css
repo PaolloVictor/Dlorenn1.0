@@ -12,17 +12,11 @@ html, body {
     width: 100%;
 }
 
-
 body {
     background-color: black;
     color: #fff;
     font-size: 16px;
-    overflow: hidden;
-    width: 100%;
-    min-height: 100vh; /* Garante que o body ocupe toda a tela */
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box; /* Evita que padding e border aumentem o tamanho */
+    min-height: 100vh;
 }
 
 /* Estilos base para responsividade */
@@ -335,9 +329,9 @@ section {
 
                 & .description {
                     color: #d9d9d9;
-                    font-size: 1,4vw;
+                    font-size: 1.4vw;
                     text-align: right;
-                    max-width: 1,0vw;
+                    max-width: 10vw;
                     
                     @media (max-width: 768px) {
                         font-size: 14px;

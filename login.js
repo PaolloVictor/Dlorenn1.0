@@ -1,27 +1,13 @@
-// Configuração do Firebase
-// Configuração para Firebase SDK v9 (versão compat)
+// Script para login e autenticação - D.Lorenn
+// Firebase já inicializado no firebase-config.js
 
-// Configuração do Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyDT-aNgU1x_KE2ZAGNm0n-ybwSLlhFlWug",
-  authDomain: "dlorenn-a46ca.firebaseapp.com",
-  projectId: "dlorenn-a46ca",
-  storageBucket: "dlorenn-a46ca.firebasestorage.app",
-  messagingSenderId: "506404020523",
-  appId: "1:506404020523:web:a2f6219e6c70699d95e56e",
-  measurementId: "G-ZL75PD9788"
-};
-
-// Verificar se o Firebase já está inicializado
+// Verificar se o Firebase está disponível
 if (typeof firebase === 'undefined') {
   console.error('Firebase SDK não está carregado. Verifique se os scripts foram incluídos corretamente.');
 } else {
-  // Inicializar Firebase (verificando se já foi inicializado)
-  if (!firebase.apps || !firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-    console.log('Firebase inicializado com sucesso');
-    
-    // Verificar domínio atual para autenticação OAuth
+  console.log('Firebase disponível');
+  
+  // Verificar domínio atual para autenticação OAuth
     const currentDomain = window.location.hostname;
     console.log('Domínio atual:', currentDomain);
     if (currentDomain !== 'localhost' && 

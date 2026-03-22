@@ -1,23 +1,7 @@
 // Script para cadastro de usuários - D.Lorenn
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Configuração do Firebase
-    const firebaseConfig = {
-        apiKey: "AIzaSyDT-aNgU1x_KE2ZAGNm0n-ybwSLlhFlWug",
-        authDomain: "dlorenn-a46ca.firebaseapp.com",
-        projectId: "dlorenn-a46ca",
-        storageBucket: "dlorenn-a46ca.firebasestorage.app",
-        messagingSenderId: "506404020523",
-        appId: "1:506404020523:web:a2f6219e6c70699d95e56e",
-        measurementId: "G-ZL75PD9788"
-    };
-
-    // Inicializar Firebase (verificando se já foi inicializado)
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    
-    // Referências aos serviços do Firebase
+    // Referências aos serviços do Firebase (já inicializado no firebase-config.js)
     const auth = firebase.auth();
     const db = firebase.firestore();
     
